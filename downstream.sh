@@ -36,10 +36,14 @@ function sub_version()
     set ${version/\~/ }
     case $val in *@@*) val=${val//@@/$2};; esac
     set ${1//\./ }
-    set $@ $@
+    local argc=$# argv="$@"
     while :; do
-        case $val in *@*) val=${val/@/$1}; shift;; *) break;; esac
+        case $val in *@*) val=${val/@/$1}; shift; if [[ $# -eq 0 ]]; then set $argv; fi;; *) break;; esac
     done
+    if [[ $# -ne $argc ]]; then
+        echo "$0: $p: mismatched \"@\" placeholders" >&2
+        exit 1
+    fi
     eval $var=$val
 }
 
